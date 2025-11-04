@@ -2,6 +2,7 @@ from torch.utils.data import Dataset
 from pathlib import Path
 from PIL import Image
 import json
+from collections import defaultdict
 
 
 class SingleFactorDataset(Dataset):
@@ -78,3 +79,20 @@ class SingleFactorDataset(Dataset):
             image = self.transform(image)
 
         return image, sample
+
+    def get_factor_statistics(self):
+        """Get statistics about factors in the dataset"""
+        factor_counts = defaultdict(int)
+        scene_counts = defaultdict(int)
+
+        for sample in self.samples:
+            factor_counts[sample['factor_group']] += 1
+            scene_counts[sample['scene']] += 1
+
+        return {
+            'total_samples': len(self.samples),
+            'unique_factors': len(factor_counts),
+            'unique_scenes': len(scene_counts),
+            'factor_counts': dict(factor_counts),
+            'scene_counts': dict(scene_counts)
+        }
